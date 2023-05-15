@@ -1,0 +1,11 @@
+{
+    "python.analysis.typeCheckingMode": "basic",
+    "vscode-pets.throwBallWithMouse": true,
+    "vscode-pets.petType": "rat",
+    "vscode-pets.petSize": "medium",
+    "vscode-pets.petColor": "white",
+    "synthwave84.brightness": 1,
+    "githubPullRequests.ignoredPullRequestBranches": [
+        "main"
+    ]
+}

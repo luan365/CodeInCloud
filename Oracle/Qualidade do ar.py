@@ -27,159 +27,140 @@ print("Successfully connected to Oracle Database")
 
 cursor = connection.cursor() #cria conexão para executar e manipular dos dados SQL
 
-cursor.execute("""
-    begin
-        execute immediate 'drop table parametros';
-        exception when others then if sqlcode <> -942 then raise; end if;
-    end;""")
+try:
+    cursor.execute("""
+        create table parametros (
+            ID_parametros number generated always as identity,
+            mp10 number,
+            mp25 number,
+            so2 number,
+            no2 number,
+            o3 number,
+            co number)""")
+    print("Tabela criada")
+except:
+    print("Tabela já criada")
 
-cursor.execute("""
-    create table parametros (
-        ID_parametros number generated always as identity,
-        mp10 number,
-        mp25 number,
-        so2 number,
-        no2 number,
-        o3 number,
-        co number)""")
-
-
-while True:
 #While para rodar o programa mais de uma vez
-    while True:
-            print("{:-^30}".format("Menu"))
-            escolha = int(input("1- Inserir Dados \n2- Atualizar Dados \n3- Excluir Dados \n0- Sair"))
-            
-            if(escolha == 1 or 2): break
 
-            elif(escolha == 3): break
-                 
-            elif(escolha == 0):
-                exit()
-            
-            else:
-                print("Escolha um valor válido")
+registro_encontrado = False
+while True:
 
-
-
-
-
-
-
-    #ler numero de linhas da tabela
-    cursor.execute('SELECT * FROM parametros')
-    resultados = cursor.fetchall()
-    num_linhas = cursor.rowcount
-
-    print(pd.DataFrame(resultados))
-    print("\n\n", resultados)
-
-
-    if(escolha == 2):
-        if(len(resultados) != 0):
-            print("Para qual valores deseja atualizar: ")
-            for i in range(len(resultados)):
-                print(resultados[i])
-        else: 
-            print("Não existe uma tabela para alterar os valores")
-            print(len(resultados))
+    while True:  
+        alterar = 0        
+        print("{:-^30}".format("Menu"))
+        escolha = int(input("1- Inserir Dados \n2- Atualizar Dados \n3- Excluir Dados \n0- Sair\n"))
         
+        if(escolha == 1): break
 
-    while True:
-    #while para repitir valores caso não seja maior que zero ou numérico
-        try:
-        #try para conferir se valor é numérico
-            mp10 = float(input("\nDigite a quantidade de partículas inaláveis: "))
-            if (mp10 >= 0): 
+        if(escolha == 2): 
+            cursor.execute("""
+                SELECT COUNT(*) FROM parametros
+            """)
+
+            resultado = cursor.fetchone()
+
+            if(resultado[0] == 0):
+                print("Nenhum valor encontrado")
                 break
-                #break para sair desse laço de repetição e ir para o3 próximo
             else:
-            #else para informar erro caso valor seja menor que zero 
-                print("Valor não pode ser menor que zero")
-        except:
-        #except para informar erro caso valor não seja numérico
-            print("Somente valores númericos aceitos")
+                cursor.execute(""" SELECT * FROM parametros """)
+                # Obter os nomes das colunas
+                colunas = [descricao[0] for descricao in cursor.description]    
+                # Obter os valores da tabela
+                valores = cursor.fetchall() 
+                # Criar um DataFrame do Pandas
+                nomeColunas = pd.DataFrame(valores, columns=colunas) 
+                # Imprimir o DataFrame
+                print(nomeColunas)
+                
+                # Loop até que um ID válido seja fornecido
+                id_registro = input("Digite o ID_PARAMETROS do registro a ser alterado: ")
+
+                # Verificar se o ID fornecido é um valor numérico
+                if not id_registro.isdigit():
+                    print("ID inválido. O ID deve ser um valor numérico.")
+                else:
+                    # Executar uma consulta para verificar se o registro com o ID fornecido existe
+                    cursor.execute("SELECT * FROM parametros")
+
+                    # Verificar se o registro com o ID fornecido existe
+                    for i in cursor:
+                        if i[0] == int(id_registro):
+                            registro_encontrado = True
+                        
+                if(registro_encontrado): break
+                else: print("Id não encontrado")
+
+
+        elif(escolha == 3): break
+                
+        elif(escolha == 0):
+            exit()
+        
+        else:
+            print("Escolha um valor válido")
+
+    def Values(mensagem):
+        while True:
+            try:
+                valor = float(input(mensagem))
+                if valor >= 0:
+                    return valor
+                else:
+                    print("Valor não pode ser menor que zero.")
+            except ValueError:
+                print("Somente valores numéricos são aceitos.")
+
+    # Obter valores para cada coluna
+    mp10 = Values("\nDigite a quantidade de partículas inaláveis: ")
+    mp25 = Values("\nDigite a quantidade de partículas inaláveis finas: ")
+    so2 = Values("\nDigite a quantidade de dióxido de enxofre: ")
+    no2 = Values("\nDigite a quantidade de dióxido de nitrogênio: ")
+    o3 = Values("\nDigite a quantidade de ozônio: ")
+    co = Values("\nDigite a quantidade de monóxido de carbono: ")
+
+    if(escolha == 1):
+
+        #inserir dados na tabela
+        cursor.execute(f"""
+            insert into parametros (mp10, mp25, so2, no2, o3, co) values({mp10},{mp25},{so2},{no2},{o3},{co}) 
+        """)
+
+        connection.commit()  
+
+        print("A média da qualidade do ar está", end = " ")
+
+        if ((mp10 <= 50) and (mp25 <= 25) and (so2 <= 20) and (no2 <= 200) and (o3 <= 100) and (co <= 9)):
+            print("boa\n")
+
+        elif ((mp10 <= 120) and (mp25 <= 60) and (so2 <= 60) and (no2 <= 240) and (o3 <= 140) and (co <= 11)):
+            print("moderada\n")
+            print("Pessoas de grupos sensíveis (crianças, idosos e pessoas com doenças respiratórias e cardíacas)"
+                "podem apresentar sintomas como tosse seca e cansaço. \nA população, em geral, não é afetada.")
             
-    while True:
-        try:
-            mp25 = float(input("\nDigite a quantidade de partículas inaláveis finas: "))
-            if (mp25 >= 0): break
-            else: print("Valor não pode ser menor que zero")
-        except:
-            print("Somente valores númericos aceitos")
-
-    while True:
-        try:
-            so2 = float(input("\nDigite a quantidade de dióxido de enxofre: "))
-            if (so2 >= 0): break
-            else: print("Valor não pode ser menor que zero")
-        except:
-            print("Somente valores númericos aceitos")
-
-    while True:
-        try:
-            no2 = float(input("\nDigite a quantidade de dióxido de nitrogênio: "))
-            if (no2 >= 0): break
-            else: print("Valor não pode ser menor que zero")
-        except:
-            print("Somente valores númericos aceitos")
-
-    while True:
-        try:
-            o3 = float(input("\nDigite a quantidade de ozônio: "))
-            if (o3 >= 0): break
-            else: print("Valor não pode ser menor que zero")
-        except:
-            print("Somente valores númericos aceitos")
-
-    while True:
-        try:     
-            co = float(input("\nDigite a quantidade de monóxido de carbono: "))
-            if (co >= 0): break
-            else: print("Valor não pode ser menor que zero")
-        except:
-            print("Somente valores númericos aceitos")
-
-
-    #inserir dados na tabela
-    cursor.execute(f"""
-        insert into parametros (mp10, mp25, so2, no2, o3, co) values({mp10},{mp25},{so2},{no2},{o3},{co}) 
-    """)
-
-    connection.commit()  
-
-    #ler numero de linhas da tabela
-    cursor.execute('SELECT * FROM parametros')
-    resultados = cursor.fetchone()
-    num_linhas = cursor.rowcount
-
-    print("A média da qualidade do ar está", end = " ")
-
-    if ((mp10 <= 50) and (mp25 <= 25) and (so2 <= 20) and (no2 <= 200) and (o3 <= 100) and (co <= 9)):
-        print("boa\n")
-
-    elif ((mp10 <= 120) and (mp25 <= 60) and (so2 <= 60) and (no2 <= 240) and (o3 <= 140) and (co <= 11)):
-        print("moderada\n")
-        print("Pessoas de grupos sensíveis (crianças, idosos e pessoas com doenças respiratórias e cardíacas)"
-            "podem apresentar sintomas como tosse seca e cansaço. \nA população, em geral, não é afetada.")
-        
-    elif ((mp10 <= 150) and (mp25 <= 125) and (so2 <= 365) and (no2 <= 320) and (o3 <= 160) and (co <= 13)):
-        print("ruim\n")
-        print("Toda a população pode apresentar sintomas como tosse seca, cansaço, ardor nos olhos, nariz e garganta." 
-            "\nPessoas de grupos sensíveis (crianças, idosos e pessoas com doenças respiratórias e cardíacas)" 
-            "podem apresentar efeitos mais sérios na saúde.")
-        
-    elif ((mp10 <= 250) and (mp25 <= 210) and (so2 <= 800) and (no2 <= 1130) and (o3 <= 200) and (co <= 15)):
-        print("muito ruim\n")
-        print("Toda a população pode apresentar agravamento dos sintomas como tosse seca, cansaço, ardor nos olhos," 
-            "nariz e garganta e ainda falta de ar e respiração ofegante. \nEfeitos ainda mais graves à saúde de grupos sensíveis"
-            "(crianças, idosos e pessoas com doenças respiratórias e cardíacas).")
-        
-    else:
-        print("péssima\n")
-        print("Toda a população pode apresentar sérios riscos de manifestações de doenças respiratórias e cardiovasculares. \n" 
-            "Aumento de mortes prematuras em pessoas de grupos sensíveis.")
-    
-    escolha = input("\nDeseja inserir outros valores? (s/n): ").lower()
-    if((escolha != "s")):
-        break
+        elif ((mp10 <= 150) and (mp25 <= 125) and (so2 <= 365) and (no2 <= 320) and (o3 <= 160) and (co <= 13)):
+            print("ruim\n")
+            print("Toda a população pode apresentar sintomas como tosse seca, cansaço, ardor nos olhos, nariz e garganta." 
+                "\nPessoas de grupos sensíveis (crianças, idosos e pessoas com doenças respiratórias e cardíacas)" 
+                "podem apresentar efeitos mais sérios na saúde.")
+            
+        elif ((mp10 <= 250) and (mp25 <= 210) and (so2 <= 800) and (no2 <= 1130) and (o3 <= 200) and (co <= 15)):
+            print("muito ruim\n")
+            print("Toda a população pode apresentar agravamento dos sintomas como tosse seca, cansaço, ardor nos olhos," 
+                "nariz e garganta e ainda falta de ar e respiração ofegante. \nEfeitos ainda mais graves à saúde de grupos sensíveis"
+                "(crianças, idosos e pessoas com doenças respiratórias e cardíacas).")
+            
+        else:
+            print("péssima\n")
+            print("Toda a população pode apresentar sérios riscos de manifestações de doenças respiratórias e cardiovasculares. \n" 
+                "Aumento de mortes prematuras em pessoas de grupos sensíveis.")
+            
+    elif(escolha == 2):
+        cursor.execute(f"UPDATE parametros SET mp10 = {mp10}, mp25 = {mp25}, so2 = {so2}, no2 = {no2}, o3 = {o3}, co = {co} WHERE ID_PARAMETROS = {alterar}")
+        connection.commit()
+        cursor.execute(""" SELECT * FROM parametros """)
+        colunas = [descricao[0] for descricao in cursor.description]    
+        valores = cursor.fetchall() 
+        nomeColunas = pd.DataFrame(valores, columns=colunas) 
+        print(nomeColunas)

@@ -1,9 +1,9 @@
 print("{:-^40}".format("Sistema médico"))
 
-dados = [{ "Doença": "Gripe", "Sintomas" : ["Tosse", "Febre" , "Dor Garganta"]},
-         { "Doença": "Malaria", "Sintomas" : ["Suor", "Febre" , "Dor Corpo"]},
-         { "Doença": "Covid", "Sintomas" : ["Tosse", "Febre" , "Dor Peito"]},     
-         { "Doença": "Dengue", "Sintomas" : ["Tosse", "Dor Muscular"]}     
+dados = [{ "Doença": "Gripe",   "Sintomas" : {"Tosse": 6, "Febre": 5 , "Dor Garganta": 4}},
+         { "Doença": "Malaria", "Sintomas" : {"Suor": 4, "Febre": 6 , "Dor Corpo": 7}},
+         { "Doença": "Covid",   "Sintomas" : {"Tosse": 5, "Febre": 9, "Dor Peito": 5}},     
+         { "Doença": "Dengue",  "Sintomas" : {"Tosse": 3, "Dor Muscular": 9}}     
 ]
 """
 
@@ -30,28 +30,11 @@ for i in dados:
 if(not flag): print("Não encontrada")
 """
 
-s1 = input("Digite o sintoma: ")
-s2 = input("Digite o sintoma: ")
-total = []
 for i in dados:
     st = i["Sintomas"]
-    ns = len(st)
-    total.append(ns)
+    doenca = i["Doença"]
     soma = 0
     for j in st:
-        if s1 == j: soma += 1
-        if s2 == j: soma += 1
-    total.append(soma)
-#
-aux = input("Digite o sintoma: ")
-print("\nVerifica as doenças pelo sintoma")
-flag = True
-txt = ""
-for i in dados:
-    st = i["Sintomas"]
-    for j in st:
-        if(aux == j):
-            txt += i["Doença"] + " "
-            flag = True
-print(f"{txt} " if flag else "Não encontrado")
+        soma += st[j]
+    print(f"Total peso de {doenca} é {soma}")
 

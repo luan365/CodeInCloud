@@ -98,7 +98,6 @@ while continuar == "s":
 
         print("Pagamento efetuado")
 
-        continuar = input("Deseja reiniciar o programa(s/n)? \n ")
-        continuar.lower()
+        continuar = input("Deseja reiniciar o programa(s/n)? \n ").lower()
 
 print("Obrigado pela pregerência! \nVolte Sempre :)")

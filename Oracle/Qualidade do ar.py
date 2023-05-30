@@ -14,6 +14,7 @@ import getpass
 import oracledb
 import pandas as pd
 import msvcrt
+import numpy as np
 
 pw = "Qvuvw6"
 #pw = getpass.getpass("Enter password: ")
@@ -59,7 +60,7 @@ def valorParametro(parametro):
 
 #Função para mosdtrar a tabela usando a biblioteca pandas
 def mostrarTabela():
-    cursor.execute("SELECT COUNT(*) FROM parametros")
+    cursor.execute("""SELECT COUNT(*) FROM parametros""")
     resultado = cursor.fetchone()[0]
     if resultado == 0:
         print("Nenhuma tabela encontrada.\n")
@@ -84,9 +85,9 @@ while True:
             try:
                 escolha = int(msvcrt.getch())       
                 break
-            except: print("Digite um valor numérico")
+            except ValueError: print("Digite um valor numérico")
 
-    cursor.execute("SELECT COUNT(*) FROM parametros")
+    cursor.execute("""SELECT COUNT(*) FROM parametros""")
     resultado = cursor.fetchone()[0]
 
     if escolha == 1:
@@ -99,12 +100,10 @@ while True:
         co = valorParametro("\nDigite a quantidade de monóxido de carbono: ")
 
         #Pega o maior valor do id_parametros e soma 1 caso tenha alguma tabela, senão é 0
-        cursor.execute("select max(id_parametros) from parametros")
+        cursor.execute("""select max(id_parametros) from parametros""")
         id_registro = cursor.fetchone()[0]
         id_registro = id_registro + 1 if id_registro is not None else 0
-        
-        #inserir dados na tabela
-        cursor.execute(f"""insert into parametros (id_parametros, mp10, mp25, so2, no2, o3, co) values({id_registro}, {mp10},{mp25},{so2},{no2},{o3},{co}) """)
+
         print("\nA média da qualidade do ar está", end=" ")
 
         if mp10 <= 50 and mp25 <= 25 and so2 <= 20 and no2 <= 200 and o3 <= 100 and co <= 9:
@@ -128,6 +127,37 @@ while True:
                 "Toda a população pode apresentar sérios riscos de manifestações de doenças respiratórias e cardiovasculares. \n"
                 "aumento de mortes prematuras em pessoas de grupos sensíveis.\n")
         mostrarTabela()
+                
+        #Definir a matriz de parâmetros
+        mzParametros = np.array([[mp10, mp25, so2],
+                                 [no2, o3, co],
+                                 [0, 0, 0]])
+        # Definir a matriz de criptografia
+        mzCript = np.array([[15, 8, 7],
+                            [26, 54, 13],
+                            [23, 9, 6]])
+        # Multiplicar as matrizes
+        resultado = np.dot(mzParametros, mzCript)
+        print(resultado)
+
+        mzInv = np.linalg.inv(mzCript)
+
+        # Multiplicar a matriz resultante pelo inverso da matriz de criptografia
+        mzDescript = np.dot(resultado, mzInv)
+
+        # Converter cada elemento individualmente em inteiros
+        mzDescript = np.dot(resultado, mzInv)
+
+        print(mzDescript)
+
+        #inserir dados na tabela
+        mp10 = resultado[0][0]
+        mp25 = resultado[0][1]
+        so2 = resultado[0][2]
+        no2 = resultado[1][0]
+        o3 = resultado[1][1]
+        co = resultado[1][2]
+        cursor.execute(f"""insert into parametros (id_parametros, mp10, mp25, so2, no2, o3, co) values({id_registro}, {mp10},{mp25},{so2},{no2},{o3},{co}) """)
 
     elif (escolha == 2 or escolha == 3) and resultado != 0:
         mostrarTabela()
@@ -135,8 +165,7 @@ while True:
         while True:
             try:
                 #Se tiver escolhido 2 no menu, ira mostrar a palavra "alterada" no final do texto, senão (que no caso é se for 3), excluída
-                id_registro = int(input("\nDigite o ID_PARAMETROS do registro a ser " +
-                                    ("alterada" if escolha == 2 else "excluída") + ": "))
+                id_registro = int(input("\nDigite o ID_PARAMETROS do registro a ser " + ("alterada" if escolha == 2 else "excluída") + ": "))
                 break
             except:
                 print("ID inválido. Digite um número inteiro válido.")
@@ -174,8 +203,8 @@ while True:
             print("\nRegistro atualizado com sucesso!\n")
 
         elif escolha == 3:
-            cursor.execute(f"DELETE FROM parametros WHERE id_parametros = {id_registro}")
-            cursor.execute("SELECT * FROM parametros")
+            cursor.execute(f"""DELETE FROM parametros WHERE id_parametros = {id_registro}""")
+            cursor.execute("""SELECT * FROM parametros""")
             print("\nRegistro excluído com sucesso!\n")
 
         cursor.execute(f""" UPDATE parametros SET id_parametros = id_parametros - 1 WHERE id_parametros > {id_registro} """)

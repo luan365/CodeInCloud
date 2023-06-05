@@ -1,40 +1,22 @@
-print("{:-^40}".format("Sistema médico"))
+print("{:-^40}".format("Qualidade de sono"))
 
-dados = [{ "Doença": "Gripe",   "Sintomas" : {"Tosse": 6, "Febre": 5 , "Dor Garganta": 4}},
-         { "Doença": "Malaria", "Sintomas" : {"Suor": 4, "Febre": 6 , "Dor Corpo": 7}},
-         { "Doença": "Covid",   "Sintomas" : {"Tosse": 5, "Febre": 9, "Dor Peito": 5}},     
-         { "Doença": "Dengue",  "Sintomas" : {"Tosse": 3, "Dor Muscular": 9}}     
+dados = [{"Efeito": "Má qualidade de sono",            "Motivo"  : {"Atividade física": 4, "Alimentação": 5, "Quantidade de água bebida": 3, "Sobrecarga" : 8}},
+         {"Efeito": "Boa qualidade de sono",           "Motivo"  : {"Atividade física": 9, "Alimentação": 9, "Quantidade de água bebida": 9, "Estresse": 0}},
+         {"Efeito": "Insônia",                         "Motivo"  : {"Barulho": 6, "Alimentação": 5, "Trabalho Noturno": 8, "Estresse": 9}},
+         {"Efeito": "Sonolência excessiva",            "Motivo"  : {"Atividade física": 2, "Estresse": 3, "Quantidade de água bebida": 3, "Noite mal dormida": 9}},
+         {"Efeito": "Pesadelos frequentes",            "Motivo"  : {"Ansiedade": 9, "Estresse": 8, "Medo": 10}},
+         {"Efeito": "Dificuldade de concentração",     "Motivo"  : {"Estresse": 8, "Sobrecarga": 7, "Alimentação": 3}},
+         {"Efeito": "Pouca disposição durante o dia",  "Motivo"  : {"Atividade física": 3, "Alimentação": 2, "Noite mal dormida": 8}},
+         {"Efeito": "Despertares noturnos frequentes", "Motivo"  : {"Atividade física": 4, "Alimentação": 3, "Estresse": 9, "Medo": 9}}
 ]
-"""
 
-print("Imprime tudo")
-for i in dados:
-    print(i)
-
-
-print("\nImpreme somente as doenças")
-for i in dados:
-    print(i["Doença"], end=" ")
-
-
-print("\n\n\nImprime as doenças e os sitomas")
-for i in dados:
-    print(i["Doença"],"\t",i["Sintomas"])
-
-
-print("\nVerifica se há alguma uma doença cadastrada")
-aux = input("Doença:")
-flag = False
-for i in dados:
-    if(aux == i["Doença"]): print(f"{aux} Está cadastrado e apresenta sintomas como ", i["Sintomas"])
-if(not flag): print("Não encontrada")
-"""
 
 for i in dados:
-    st = i["Sintomas"]
-    doenca = i["Doença"]
+    motivo = i["Motivo"]
+    efeito = i["Efeito"]
     soma = 0
-    for j in st:
-        soma += st[j]
-    print(f"Total peso de {doenca} é {soma}")
+    for j in motivo:
+        soma += motivo[j]
+    print(f"Total peso de {efeito} é {soma}")
+
 
